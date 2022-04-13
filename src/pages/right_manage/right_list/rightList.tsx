@@ -13,7 +13,7 @@ interface rightInterface {
 export default function RightList() {
   const [rightList, setRightList] = useState<rightInterface[]>([])
 
-  useEffect(() => {
+  function getRightList(){
     fetch('/api/account/rights', {
       method: 'GET',
     }
@@ -21,6 +21,10 @@ export default function RightList() {
       setRightList(childrenHandler(data))
     }
     )
+  }
+
+  useEffect(() => {
+    getRightList()
   }, [])
 
   const deleteConfirm = useCallback((record) => {
@@ -39,8 +43,7 @@ export default function RightList() {
             "id": record.id,
           })
         }).then(data => data.json()).then(data => {
-          console.log(data)
-          window.location.reload()
+          getRightList()
         })
       },
       cancelText: '取消',
@@ -70,11 +73,14 @@ export default function RightList() {
       title: '启用状态',
       dataIndex: 'permission',
       key: 'permission',
-      render: (permission: number) => {
+      render: (permission: number, record: any) => {
         return <Switch checked={permission === 1} onChange={()=>{
-          // TODO: 更改启用/禁用状态
-          // var newRightList = rightList
-          permission = 0
+          fetch('/api/account/rights/' + record.id, {
+            method: 'PUT',
+          }).then(data=>data.json()).then(data=>{
+            console.log('权限项更新完成')
+          })
+          getRightList()
         }} />
       }
     },
