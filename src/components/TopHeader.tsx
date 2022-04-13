@@ -28,7 +28,7 @@ const menu = (
 
 function TopHeader(props: LayoutProps) {
   const { layout, dispatch } = props
-  // const [collapsed, changeCollapsed] = useState(false)
+
   return (
     <Header className="site-layout-background" style={{ padding: '0 16px' }}>
       {React.createElement(layout.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -36,6 +36,12 @@ function TopHeader(props: LayoutProps) {
         style: { fontSize: '20px' },
         onClick: () => dispatch({ type: 'layout/toggleCollapsed' }),
       })}
+      <span style={{
+        marginLeft: '16px',
+        fontSize: '18px',
+        height: '64px',
+        lineHeight: '64px'
+      }}>{layout.header}</span>
       <div style={{ float: 'right' }}>
         <span>欢迎登录系统</span>
         <Dropdown overlay={menu} placement="bottomRight">

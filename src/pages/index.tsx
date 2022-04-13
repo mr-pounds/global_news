@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useRouteMatch, useHistory } from 'umi'
+import React, { useEffect } from 'react'
+import { useHistory, useLocation } from 'umi'
 import SideMenu from '@/components/SideMenu'
 import TopHeader from '@/components/TopHeader'
 import { Layout } from 'antd';
@@ -10,13 +10,13 @@ interface PropsInterface {
 }
 
 export default function index(props: PropsInterface) {
-    const match = useRouteMatch()
     const history = useHistory()
+    const location = useLocation()
     const { Content } = Layout;
 
     useEffect(() => {
-        // console.log(props)
-        if (match.isExact) {
+        // console.log('loaction', location)
+        if (location.pathname === '/') {
             history.push('/home')
         }
     })
