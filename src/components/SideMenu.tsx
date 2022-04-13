@@ -1,36 +1,35 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Layout, Menu } from 'antd';
-import {
-  UserOutlined,
-  HomeOutlined,
-  SettingOutlined
-} from '@ant-design/icons';
 import { useHistory } from 'umi';
-import getMenuIcon from './menuIcon'
+import getMenuIcon from './MenuIcon'
+import { LayoutModelState, Dispatch, connect } from 'umi';
+
+
+interface menuItemInterface {
+  id: number,
+  key: string,
+  title: string,
+  children: menuItemInterface[]
+}
+
+interface LayoutProps {
+  layout: LayoutModelState,
+  dispatch: Dispatch
+}
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-interface menuItemInterface {
-  key: string,
-  title: string,
-  // icon: ReactNode,
-  children: menuItemInterface[]
-}
-
-
-export default function SideMenu() {
-
+function SideMenu(props: LayoutProps){
   const history = useHistory()
-
-  const [collapsed, changeCollapsed] = useState(false)
+  const { layout } = props
   const [menuList, setMenuList] = useState<Array<menuItemInterface>>([])
 
-  useEffect(()=>{
+  useEffect(() => {
     fetch('/api/account/rights', {
-      method:'POST',
+      method: 'POST',
     }
-    ).then(data=>data.json()).then(data=>{
+    ).then(data => data.json()).then(data => {
       setMenuList(data)
     })
   }, [])
@@ -56,11 +55,21 @@ export default function SideMenu() {
   }
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
-      <div className="logo">First Project</div>
+    <Sider trigger={null} collapsible collapsed={layout.collapsed}>
+      <div className="logo">{!layout.collapsed ? 'First Project' : null}</div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
         {menuList.map((item) => renderMenuItem(item))}
       </Menu>
     </Sider>
   )
 }
+
+export default connect(
+  ({ layout }: {
+    layout: LayoutModelState
+  }) => {
+    return {
+      layout: layout,
+    }
+  },
+)(SideMenu);

@@ -14,6 +14,7 @@ export default defineConfig({
     dark: false,
     compact: false,
   },
+  dva:{},
   // links: [
   //   { rel:'icon', type:'image/x-icon', href:'react_icons.webp' },
   // ],
