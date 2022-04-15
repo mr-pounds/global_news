@@ -12,19 +12,19 @@ interface rightInterface {
 export default function RightList() {
   const [rightList, setRightList] = useState<rightInterface[]>([])
 
-  function getRightList(){
+  function getRightList() {
     fetch('/api/account/getRightsList')
-    // fetch('/mock/account/rights')
+      // fetch('/mock/account/rights')
       .then(data => data.json()).then(data => {
-      setRightList(data.map((item: any)=>{
+        setRightList(data.map((item: any) => {
 
-        if(item.children && item.children.length === 0) {
-          item.children = null
-        }
-        return item
-      }))
-    }
-    )
+          if (item.children && item.children.length === 0) {
+            item.children = null
+          }
+          return item
+        }))
+      }
+      )
   }
 
   useEffect(() => {
@@ -78,13 +78,13 @@ export default function RightList() {
       dataIndex: 'permission',
       // key: 'permission',
       render: (permission: number, record: any) => {
-        return <Switch checked={permission === 1} onChange={()=>{
+        return <Switch checked={permission === 1} onChange={() => {
           fetch('/api/account/changeRightPermission?id=' + record.id, {
             method: 'PUT',
-          }).then(data=>data.json()).then(data=>{
-            if(data.msg === 'ok'){
+          }).then(data => data.json()).then(data => {
+            if (data.msg === 'ok') {
               getRightList()
-            }else{
+            } else {
               console.log('修改失败')
             }
           })
@@ -95,7 +95,7 @@ export default function RightList() {
 
   return (
     <div>
-      <Table dataSource={rightList} columns={columns} rowKey='url'/>;
+      <Table dataSource={rightList} columns={columns} rowKey='url' />;
     </div>
   )
 }
