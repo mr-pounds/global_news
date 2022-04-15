@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Table, Tag, Button, Modal, Switch } from 'antd'
-import childrenHandler from '@/components/utils/childrenHandler'
 import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 interface rightInterface {
   id: number,
-  key: string,
+  url: string,
   title: string,
   children: rightInterface[] | null
 }
@@ -14,11 +13,16 @@ export default function RightList() {
   const [rightList, setRightList] = useState<rightInterface[]>([])
 
   function getRightList(){
-    fetch('/api/account/rights', {
-      method: 'GET',
-    }
-    ).then(data => data.json()).then(data => {
-      setRightList(childrenHandler(data))
+    fetch('/api/account/getRightsList')
+    // fetch('/mock/account/rights')
+      .then(data => data.json()).then(data => {
+      setRightList(data.map((item: any)=>{
+
+        if(item.children && item.children.length === 0) {
+          item.children = null
+        }
+        return item
+      }))
     }
     )
   }
@@ -59,47 +63,39 @@ export default function RightList() {
     {
       title: '权限名称',
       dataIndex: 'title',
-      key: 'title',
+      // key: 'title',
     },
     {
       title: '权限路径',
-      dataIndex: 'key',
-      key: 'key',
-      render: (key: string) => {
-        return <Tag color="gold">{key}</Tag>
+      dataIndex: 'url',
+      // key: 'url',
+      render: (url: string) => {
+        return <Tag color="gold">{url}</Tag>
       }
     },
     {
       title: '启用状态',
       dataIndex: 'permission',
-      key: 'permission',
+      // key: 'permission',
       render: (permission: number, record: any) => {
         return <Switch checked={permission === 1} onChange={()=>{
-          fetch('/api/account/rights/' + record.id, {
+          fetch('/api/account/changeRightPermission?id=' + record.id, {
             method: 'PUT',
           }).then(data=>data.json()).then(data=>{
-            console.log('权限项更新完成')
+            if(data.msg === 'ok'){
+              getRightList()
+            }else{
+              console.log('修改失败')
+            }
           })
-          getRightList()
         }} />
-      }
-    },
-    {
-      title: '操作',
-      key: 'operate',
-      render: (record: any) => {
-        return <Button shape="circle" icon={<DeleteOutlined />} style={{
-            marginRight: '8px'
-          }} onClick={() => {
-            deleteConfirm(record)
-          }} />
       }
     },
   ]
 
   return (
     <div>
-      <Table dataSource={rightList} columns={columns} />;
+      <Table dataSource={rightList} columns={columns} rowKey='url'/>;
     </div>
   )
 }

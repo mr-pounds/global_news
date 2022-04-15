@@ -20,4 +20,10 @@ export default defineConfig({
   // ],
   favicon: 'react_icons.webp',
   title: '第一个 React 项目',
+  proxy:{
+    '/api':{
+      target:'http://localhost:8000',
+      changeOrigin:true,
+    }
+  }
 });

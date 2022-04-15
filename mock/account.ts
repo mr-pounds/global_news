@@ -74,15 +74,15 @@ const rights = [
 ]
 
 export default {
-    'GET /api/account/rights': rights,
-    'DELETE /api/account/rights/:id': (req: any, res: any)=>{
+    'GET /mock/account/rights': rights,
+    'DELETE /mock/account/rights/:id': (req: any, res: any)=>{
       console.log('删除权限项', req.params.id)
       res.send({
         msg: '',
         code: 0
       }) 
     },
-    'PUT /api/account/rights/:id': (req: any, res: any)=>{
+    'PUT /mock/account/rights/:id': (req: any, res: any)=>{
       console.log('更新权限项', req.params.id)
       res.send({
         msg: '',

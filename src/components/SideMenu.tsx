@@ -7,7 +7,7 @@ import { LayoutModelState, Dispatch, connect } from 'umi';
 
 interface menuItemInterface {
   id: number,
-  key: string,
+  url: string,
   title: string,
   permission: number
   children: menuItemInterface[]
@@ -21,28 +21,29 @@ interface LayoutProps {
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-function SideMenu(props: LayoutProps){
+function SideMenu(props: LayoutProps) {
   const history = useHistory()
   const location = useLocation()
   const { layout, dispatch } = props
   const [menuList, setMenuList] = useState<Array<menuItemInterface>>([])
 
   useEffect(() => {
-    fetch('/api/account/rights', {
+    fetch('/api/getMenuList', {
       method: 'GET',
     }
     ).then(data => data.json()).then(data => {
       setMenuList(data)
+      // console.log(data)
     })
   }, [])
 
   function renderMenuItem(item: menuItemInterface) {
-    if(item.permission === 0){
+    if (item.permission === 0) {
       return null
     }
     if (item.children && item.children.length > 0) {
       return (
-        <SubMenu key={item.key} icon={getMenuIcon(item.key)} title={item.title}>
+        <SubMenu key={item.url} icon={getMenuIcon(item.url)} title={item.title}>
           {item.children.map((childrenItem) => {
             return renderMenuItem(childrenItem)
           })}
@@ -50,15 +51,15 @@ function SideMenu(props: LayoutProps){
       )
     } else {
       return (
-        <Menu.Item key={item.key} icon={getMenuIcon(item.key)} onClick={() => {
-            // console.log(history)
-            if(location.pathname != item.key) {
-              history.push(item.key)
-              dispatch({
-                type: 'layout/setHeader',
-                payload: item.title
-              })
-            }          
+        <Menu.Item key={item.url} icon={getMenuIcon(item.url)} onClick={() => {
+          // console.log(history)
+          if (location.pathname != item.url) {
+            history.push(item.url)
+            dispatch({
+              type: 'layout/setHeader',
+              payload: item.title
+            })
+          }
         }}>
           {item.title}
         </Menu.Item>
