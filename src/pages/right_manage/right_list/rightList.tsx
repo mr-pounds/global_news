@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Table, Tag, Button, Modal, Switch } from 'antd'
-import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { Table, Tag, Modal, Switch } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 
 interface rightInterface {
   id: number,
@@ -11,24 +11,23 @@ interface rightInterface {
 
 export default function RightList() {
   const [rightList, setRightList] = useState<rightInterface[]>([])
+  const [totalNum, setTotalNum] = useState(0)
+  const [isLoading, changeIsLoading] = useState(false)
 
   function getRightList() {
     fetch('/api/account/getRightsList')
       // fetch('/mock/account/rights')
       .then(data => data.json()).then(data => {
-        setRightList(data.map((item: any) => {
-
-          if (item.children && item.children.length === 0) {
-            item.children = null
-          }
-          return item
-        }))
+        setRightList(data.data.list)
+        setTotalNum(data.data.total)
       }
       )
   }
 
   useEffect(() => {
+    changeIsLoading(true)
     getRightList()
+    changeIsLoading(false)
   }, [])
 
   const deleteConfirm = useCallback((record) => {
@@ -77,15 +76,13 @@ export default function RightList() {
       title: '启用状态',
       dataIndex: 'permission',
       // key: 'permission',
-      render: (permission: number, record: any) => {
+      render: (permission: number, record: any, index: number) => {
         return <Switch checked={permission === 1} onChange={() => {
           fetch('/api/account/changeRightPermission?id=' + record.id, {
             method: 'PUT',
           }).then(data => data.json()).then(data => {
             if (data.msg === 'ok') {
               getRightList()
-            } else {
-              console.log('修改失败')
             }
           })
         }} />
@@ -95,7 +92,13 @@ export default function RightList() {
 
   return (
     <div>
-      <Table dataSource={rightList} columns={columns} rowKey='url' />;
+      <Table dataSource={rightList} columns={columns} rowKey='url' loading={isLoading}
+        pagination={{
+          total: totalNum,
+          hideOnSinglePage: true,
+          pageSize: 10
+        }}
+      />
     </div>
   )
 }
