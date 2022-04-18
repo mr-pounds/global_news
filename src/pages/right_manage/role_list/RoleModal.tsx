@@ -1,57 +1,95 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Modal, Form, Input, Tree, message } from 'antd'
+import { request } from 'umi'
 
 
 interface RoleModalProps {
   onCancel: () => void,
   onOk: () => void,
-  // roleId?: number,
+  role?: number | null,
 }
 
 
 export default function AddRoleModal(props: RoleModalProps) {
+  // 控制校验的状态
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const { onCancel, onOk } = props;
-  const [form] = Form.useForm()
+  // 存储权限树
   const [rightTree, setRightTree] = useState()
+  // 存储已选择的 tree 的key，即 权限id
   const [checkedRightList, setCheckedRightList] = useState<number[]>([])
+  // 控制 Tree 的渲染时机，不然显示全部展开会有问题。
+  const [canLoadTree, setCanLoadTree] = useState(false)
+
   const [inputStatus, setInputState] = useState<'' | 'error' | 'warning' | undefined>('')
+  const { onCancel, onOk, role } = props;
+  const [form] = Form.useForm()
 
   useEffect(() => {
-    fetch('/api/account/getRightsList')
-      .then(data => data.json())
+    request('/api/account/getRightsList')
       .then(data => {
         setRightTree(data.data.list)
+        // 如果是编辑，就加载相关数据
+        if (role) {
+          request('/api/account/getRightsByRoleId', {
+            params: {
+              id: role
+            }
+          }).then(data => {
+            form.setFieldsValue({
+              name: data.data.name,
+              desc: data.data.desc
+            })
+            setCheckedRightList(data.data.rightList)
+          })
+        }
+        setCanLoadTree(true)
       })
   }, [])
 
-  const onCheck = (checked: any, info: any) => {
-    setCheckedRightList(checked)
-  };
-
   const handleOk = () => {
     setConfirmLoading(true)
-    fetch('/api/account/addRole', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: form.getFieldValue('name'),
-        desc: form.getFieldValue('desc'),
-        right_list: checkedRightList
-      })
-    }).then(data => data.json()).then(data => {
 
-      // 校验是否提交成功，成功就隐藏返回列表页，并重新刷新列表；
+    function handleResponse(data: any) {
+      setConfirmLoading(false)
       if (data.code === 0) {
+        message.success('保存成功')
         onOk()
       } else {
         setInputState('error')
         message.error(data.msg)
       }
-      setConfirmLoading(false)
-    })
+    }
+
+    if (role) {
+      request('/api/account/updateRole', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: role,
+          name: form.getFieldValue('name'),
+          desc: form.getFieldValue('desc'),
+          right_list: checkedRightList
+        })
+      }).then(data => {
+        handleResponse(data)
+      })
+    } else {
+      request('/api/account/addRole', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: form.getFieldValue('name'),
+          desc: form.getFieldValue('desc'),
+          right_list: checkedRightList
+        })
+      }).then(data => {
+        handleResponse(data)
+      })
+    }
   };
 
   return (
@@ -65,31 +103,25 @@ export default function AddRoleModal(props: RoleModalProps) {
       onCancel={() => { onCancel() }}
       width={600}
     >
-      <Form form={form} name="role_form" layout="vertical" initialValues={{ name: '', desc: '' }} validateTrigger='onBlur'>
+      <Form form={form} name="role_form" layout="vertical" validateTrigger='onBlur'>
         <Form.Item name={'name'} label="角色名称" rules={[{ required: true }]}>
-          <Input status={inputStatus} onChange={() => {
-            setInputState('')
-          }} />
+          <Input status={inputStatus} onChange={() => setInputState('')} />
         </Form.Item>
         <Form.Item name={'desc'} label="角色描述">
           <Input.TextArea maxLength={200} showCount />
         </Form.Item>
         <Form.Item label="权限">
-          <Tree
+          {canLoadTree && <Tree
             checkable
             defaultExpandAll
             selectable={false}
-            defaultSelectedKeys={[]}
-            defaultCheckedKeys={[]}
-            onCheck={onCheck}
+            checkedKeys={checkedRightList}
+            onCheck={(checked: any, info: any) => setCheckedRightList(checked)}
             treeData={rightTree}
             fieldNames={{ title: 'title', key: 'id', children: 'children' }}
             height={220}
-            style={{
-              background: '#f3f3f3',
-              borderRadius: '4px',
-            }}
-          />
+            style={{ background: '#f3f3f3', borderRadius: '4px' }}
+          />}
         </Form.Item>
       </Form>
     </Modal>

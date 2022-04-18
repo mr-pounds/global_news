@@ -15,9 +15,6 @@ export default defineConfig({
     compact: false,
   },
   dva:{},
-  // links: [
-  //   { rel:'icon', type:'image/x-icon', href:'react_icons.webp' },
-  // ],
   favicon: 'react_icons.webp',
   title: '第一个 React 项目',
   proxy:{
