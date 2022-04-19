@@ -94,7 +94,7 @@ export default function AddRoleModal(props: RoleModalProps) {
 
   return (
     <Modal
-      title="创建角色"
+      title={role?"编辑角色":"创建角色"}
       visible={true}
       okText="保存"
       cancelText="取消"
