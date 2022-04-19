@@ -27,13 +27,14 @@ export default function UserModal(props: ModalProps) {
     const [form] = Form.useForm()
 
     useEffect(() => {
-        if(user){
-        form.setFieldsValue({
-            name: user.name,
-            phone: user.phone,
-            region: user.region_id,
-            role: user.role_id,
-        })}
+        if (user) {
+            form.setFieldsValue({
+                name: user.name,
+                phone: user.phone,
+                region: user.region_id,
+                role: user.role_id,
+            })
+        }
     }, [])
 
     const handleOk = () => {
@@ -50,22 +51,23 @@ export default function UserModal(props: ModalProps) {
 
         form.validateFields().then(values => {
             setConfirmLoading(true)
-            if(!user){
-            request('/api/account/addUser', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: form.getFieldValue('name'),
-                    password: form.getFieldValue('password'),
-                    phone: form.getFieldValue('phone'),
-                    region: form.getFieldValue('region'),
-                    role: form.getFieldValue('role')
+            if (!user) {
+                request('/api/account/addUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: form.getFieldValue('name'),
+                        password: form.getFieldValue('password'),
+                        phone: form.getFieldValue('phone'),
+                        region: form.getFieldValue('region'),
+                        role: form.getFieldValue('role')
+                    })
+                }).then(data => {
+                    handleResponse(data)
                 })
-            }).then(data => {
-                handleResponse(data)
-            })}else{
+            } else {
                 request('/api/account/updateUser', {
                     method: 'POST',
                     headers: {
@@ -82,8 +84,8 @@ export default function UserModal(props: ModalProps) {
                     handleResponse(data)
                 })
             }
-        
-        }).catch( _ => {
+
+        }).catch(_ => {
             message.warning("请检查输入的内容")
         })
     };
@@ -103,22 +105,22 @@ export default function UserModal(props: ModalProps) {
                 <Form.Item name={'name'} label="姓名" rules={[{ required: true, message: "请输入姓名" }]}>
                     <Input />
                 </Form.Item>
-                { user? null:<Form.Item name={'password'} label="密码" rules={[{ required: true, message: "请输入密码" }]}>
+                {user ? null : <Form.Item name={'password'} label="密码" rules={[{ required: true, message: "请输入密码" }]}>
                     <Input.Password />
                 </Form.Item>}
                 <Form.Item name={'phone'} label="手机号" rules={[
-                    { required: true, message: "请输入手机号" }, 
+                    { required: true, message: "请输入手机号" },
                     { len: 11, message: "请输入正确的手机号" },]} >
-                    <Input status={inputStatus} maxLength={11} onChange={() => setInputState('')} disabled={user}/>
+                    <Input status={inputStatus} maxLength={11} onChange={() => setInputState('')} disabled={user} />
                 </Form.Item>
-                <Form.Item name={'region'} label="所属区域" rules={[{ required: true, message: "请选择所属区域"  }]}>
-                    <Select  onChange={(value: number) => form.setFieldsValue({ region: value })}>
+                <Form.Item name={'region'} label="所属区域" rules={[{ required: true, message: "请选择所属区域" }]}>
+                    <Select onChange={(value: number) => form.setFieldsValue({ region: value })}>
                         {regionList.map((item: any, index: number) => {
                             return <Option key={index + 1} value={index + 1}>{item}</Option>
                         })}
                     </Select>
                 </Form.Item>
-                <Form.Item name={'role'} label="权限角色" rules={[{ required: true, message: "请选择权限角色"  }]}>
+                <Form.Item name={'role'} label="权限角色" rules={[{ required: true, message: "请选择权限角色" }]}>
                     <Select onChange={(value: number) => form.setFieldsValue({ role: value })}>
                         {roleList.map((item: any) => {
                             return <Option key={item.id} value={item.id}>{item.name}</Option>

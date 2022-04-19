@@ -32,7 +32,7 @@ export default function UserList() {
     {
       title: '权限角色',
       dataIndex: 'role',
-      render:(text:string)=>{
+      render: (text: string) => {
         return <Tag color="gold">{text}</Tag>
       }
     },
@@ -56,7 +56,7 @@ export default function UserList() {
     {
       title: '操作',
       dataIndex: '',
-      render: ( _: null, record: any) => {
+      render: (_: null, record: any) => {
         return <div>
           <Popconfirm title="确定删除？" okText="确定" cancelText="取消" onConfirm={() => {
             request('/api/account/delUser', {
@@ -92,7 +92,7 @@ export default function UserList() {
   return (
     <div>
       <Button type="primary" onClick={() => setModalVisible(true)} style={{ marginBottom: '16px' }}>新增用户</Button>
-      {modalVisible && <UserModal user={editUser} regionList={regionList} roleList={roleList} onOk={handleOk} onCancel={handleCancel}/>}
+      {modalVisible && <UserModal user={editUser} regionList={regionList} roleList={roleList} onOk={handleOk} onCancel={handleCancel} />}
       <Table
         sticky
         columns={columns}
