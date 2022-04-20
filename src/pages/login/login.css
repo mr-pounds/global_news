@@ -1,0 +1,24 @@
+.content {
+    height: 100%;
+    width: 100%;
+    background-image: linear-gradient(to top, #30cfd0, #330867);
+
+}
+
+.login_form{
+    height: 400px;
+    width: 480px;
+    background-color: aliceblue;
+    position: fixed;
+    top: 200px;
+    right: 100px;
+    border-radius: 4px;
+    padding: 32px 48px;
+    text-align: center;
+}
+
+label{
+    font-size: 20px;
+    font-weight: bold;
+    color: #330867;
+}
