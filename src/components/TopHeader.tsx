@@ -6,6 +6,7 @@ import {
   GithubFilled,
 } from '@ant-design/icons';
 import { LayoutModelState, Dispatch, connect } from 'umi';
+import { setCookie } from '@/utils';
 
 interface LayoutProps {
   layout: LayoutModelState;
@@ -17,7 +18,13 @@ const menu = (
   <Menu>
     <Menu.Item key="admin">超级管理员</Menu.Item>
     <Menu.Item key="exit">
-      <a rel="noopener noreferrer" href="#/login">
+      <a
+        rel="noopener noreferrer"
+        href="#/login"
+        onClick={() => {
+          setCookie('token', '', -10);
+        }}
+      >
         退出登录
       </a>
     </Menu.Item>

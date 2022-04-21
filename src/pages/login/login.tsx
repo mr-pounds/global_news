@@ -1,9 +1,9 @@
 import style from './login.css';
-import { Form, Input, Button, message } from 'antd';
-import { request } from 'umi';
+import { Form, Input, Button } from 'antd';
+import { request, history } from 'umi';
 import { Md5 } from 'ts-md5';
 import { useState } from 'react';
-import setCookie from './setCookie';
+import { setCookie } from '@/utils';
 
 interface LoginError {
   error: boolean;
@@ -23,7 +23,7 @@ export default function Login() {
     }).then((res) => {
       if (res.code === 0) {
         setCookie('token', res.data.token, 1);
-        window.location.href = '/';
+        history.push('/');
       } else {
         setLoginError({
           error: true,
